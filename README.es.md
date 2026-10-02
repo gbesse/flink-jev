@@ -10,7 +10,7 @@ Compile con Java 17 y Maven 3.9.6 o posterior:
 mvn -B verify
 ```
 
-Coloque `target/flink-jev-0.1.0.jar` en el directorio `lib` de cada JobManager y TaskManager y reinicie el clúster. Defina `JEV_API_KEY` en el entorno de los TaskManagers. No ponga la clave en opciones SQL ni en archivos seguidos por Git.
+Coloque `target/flink-jev-0.1.1.jar` en el directorio `lib` de cada JobManager y TaskManager y reinicie el clúster. Defina `JEV_API_KEY` en el entorno de los TaskManagers. No ponga la clave en opciones SQL ni en archivos seguidos por Git.
 
 ```sql
 CREATE MODEL jev_review
@@ -31,6 +31,10 @@ FROM ML_PREDICT(TABLE reviews, MODEL jev_review, DESCRIPTOR(content));
 ```
 
 El ejemplo supone una tabla `reviews` con `review_id` y `content`. `endpoint` es `https://api.typesafe.ai/v1/systemone` por defecto; HTTP solo se admite para `localhost` y `127.0.0.1` en pruebas.
+
+## Ejemplo: supervisar las rutas
+
+Después de crear el modelo anterior, el [ejemplo SQL](examples/route-monitoring.sql) agrupa las filas por ruta. `review` requiere una decisión humana y `failure` un tratamiento de errores; ninguna debe interpretarse como `no`. El SQL supone la tabla `reviews` descrita antes y realiza una llamada remota por cada fila apta. Empiece con una muestra pequeña y autorizada.
 
 ## Comportamiento y límites
 

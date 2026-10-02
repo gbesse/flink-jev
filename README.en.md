@@ -10,7 +10,7 @@ Build with Java 17 and Maven 3.9.6 or newer:
 mvn -B verify
 ```
 
-Put `target/flink-jev-0.1.0.jar` in the `lib` directory of every JobManager and TaskManager, then restart the cluster. Set `JEV_API_KEY` in the TaskManagers' environment. Never put the key in SQL options or a Git-tracked file.
+Put `target/flink-jev-0.1.1.jar` in the `lib` directory of every JobManager and TaskManager, then restart the cluster. Set `JEV_API_KEY` in the TaskManagers' environment. Never put the key in SQL options or a Git-tracked file.
 
 ```sql
 CREATE MODEL jev_review
@@ -31,6 +31,10 @@ FROM ML_PREDICT(TABLE reviews, MODEL jev_review, DESCRIPTOR(content));
 ```
 
 The example assumes a `reviews` table with `review_id` and `content`. `endpoint` defaults to `https://api.typesafe.ai/v1/systemone`; HTTP is allowed only for `localhost` and `127.0.0.1` in tests.
+
+## Example: monitor the routes
+
+After creating the model above, the [SQL example](examples/route-monitoring.sql) groups rows by route. `review` needs a human decision and `failure` needs error handling; neither should be interpreted as `no`. The SQL assumes the `reviews` table described above and makes one remote call per eligible row. Start with a small, permitted sample.
 
 ## Behavior and limits
 
