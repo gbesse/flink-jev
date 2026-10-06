@@ -1,5 +1,13 @@
 # Flink Jev : décisions sémantiques dans Flink SQL
 
+## Boîte de revue / Review inbox / Bandeja de revisión
+
+L'exemple [`review-inbox.sql`](examples/review-inbox.sql) isole les routes `review` et `failure` sans les convertir en `no`. Utilisez un petit échantillon autorisé : chaque ligne peut produire un appel distant.
+
+The [`review-inbox.sql`](examples/review-inbox.sql) example isolates `review` and `failure` routes without converting them to `no`. Use a small permitted sample: each row may make a remote call.
+
+El ejemplo [`review-inbox.sql`](examples/review-inbox.sql) separa las rutas `review` y `failure` sin convertirlas en `no`. Use una muestra pequeña autorizada: cada fila puede realizar una llamada remota.
+
 Connecteur communautaire pour `ML_PREDICT` d'Apache Flink 2.3. Il pose une question oui/non à TypeSafe Jev pour chaque ligne et renvoie une probabilité, une route (`yes`, `no`, `review`, `failure`) et l'empreinte SHA-256 du texte. Les réponses incertaines vont vers `review` ; les erreurs réseau et les réponses invalides vont vers `failure`.
 
 ## Installer
@@ -10,7 +18,7 @@ Construisez avec Java 17 et Maven 3.9.6 ou plus récent :
 mvn -B verify
 ```
 
-Placez `target/flink-jev-0.1.1.jar` dans le répertoire `lib` de chaque JobManager et TaskManager, puis redémarrez le cluster. Définissez `JEV_API_KEY` dans l'environnement des TaskManagers. Ne placez jamais la clé dans les options SQL ou un fichier suivi par Git.
+Placez `target/flink-jev-0.1.2.jar` dans le répertoire `lib` de chaque JobManager et TaskManager, puis redémarrez le cluster. Définissez `JEV_API_KEY` dans l'environnement des TaskManagers. Ne placez jamais la clé dans les options SQL ou un fichier suivi par Git.
 
 ```sql
 CREATE MODEL jev_review

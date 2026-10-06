@@ -1,5 +1,9 @@
 # Flink Jev: decisiones semánticas en Flink SQL
 
+## Bandeja de revisión
+
+El ejemplo [`review-inbox.sql`](examples/review-inbox.sql) separa las rutas `review` y `failure` sin convertirlas en `no`. Use una muestra pequeña autorizada: cada fila puede realizar una llamada remota. [Français](README.md) · [English](README.en.md).
+
 Proveedor comunitario de modelos para `ML_PREDICT` de Apache Flink 2.3. Formula a TypeSafe Jev una pregunta de sí/no por fila y devuelve una probabilidad, una ruta (`yes`, `no`, `review`, `failure`) y una huella SHA-256 del texto. Las respuestas inciertas van a `review`; los errores de red y las respuestas inválidas van a `failure`.
 
 ## Instalación
@@ -10,7 +14,7 @@ Compile con Java 17 y Maven 3.9.6 o posterior:
 mvn -B verify
 ```
 
-Coloque `target/flink-jev-0.1.1.jar` en el directorio `lib` de cada JobManager y TaskManager y reinicie el clúster. Defina `JEV_API_KEY` en el entorno de los TaskManagers. No ponga la clave en opciones SQL ni en archivos seguidos por Git.
+Coloque `target/flink-jev-0.1.2.jar` en el directorio `lib` de cada JobManager y TaskManager y reinicie el clúster. Defina `JEV_API_KEY` en el entorno de los TaskManagers. No ponga la clave en opciones SQL ni en archivos seguidos por Git.
 
 ```sql
 CREATE MODEL jev_review
