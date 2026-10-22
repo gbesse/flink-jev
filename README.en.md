@@ -51,3 +51,5 @@ After creating the model above, the [SQL example](examples/route-monitoring.sql)
 MIT licensed. Independent community project, unaffiliated with Apache Flink or TypeSafe AI.
 
 [Français](README.md) · [Español](README.es.md)
+
+Responses must name the expected model and exactly the decision question; duplicate JSON keys and trailing JSON documents route to failure without a usable probability.

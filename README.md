@@ -55,3 +55,11 @@ Après avoir créé le modèle ci-dessus, [l'exemple SQL](examples/route-monitor
 Licence MIT. Projet communautaire indépendant, sans affiliation avec Apache Flink ou TypeSafe AI.
 
 [English](README.en.md) · [Español](README.es.md)
+
+## Enveloppe / Envelope / Envoltura
+
+FR — Les réponses doivent annoncer le modèle attendu et exactement la question decision ; clés JSON dupliquées et documents JSON supplémentaires sont rejetés vers failure, sans probabilité exploitable.
+
+EN — Responses must name the expected model and exactly the decision question; duplicate JSON keys and trailing JSON documents route to failure without a usable probability.
+
+ES — Las respuestas deben indicar el modelo esperado y exactamente la pregunta decision; claves JSON duplicadas y documentos adicionales van a failure sin probabilidad utilizable.
