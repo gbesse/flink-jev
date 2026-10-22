@@ -51,3 +51,5 @@ Después de crear el modelo anterior, el [ejemplo SQL](examples/route-monitoring
 Licencia MIT. Proyecto comunitario independiente, sin afiliación con Apache Flink ni TypeSafe AI.
 
 [Français](README.md) · [English](README.en.md)
+
+Las respuestas deben indicar el modelo esperado y exactamente la pregunta decision; claves JSON duplicadas y documentos adicionales van a failure sin probabilidad utilizable.

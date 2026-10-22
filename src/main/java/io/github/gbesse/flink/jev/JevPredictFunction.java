@@ -23,7 +23,7 @@ import org.apache.flink.table.functions.FunctionContext;
 
 /** One append-only input row to a probability, route and input digest. */
 public final class JevPredictFunction extends AsyncPredictFunction {
-  private static final ObjectMapper JSON = new ObjectMapper();
+  private static final ObjectMapper JSON = new ObjectMapper().enable(com.fasterxml.jackson.core.JsonParser.Feature.STRICT_DUPLICATE_DETECTION).enable(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
   private final JevSettings settings;
   private transient HttpClient http;
   private transient String key;
@@ -78,7 +78,9 @@ public final class JevPredictFunction extends AsyncPredictFunction {
               if (response.statusCode() != 200) return output(null, "failure", digest);
               byte[] reply = stream.readNBytes(100001);
               if (reply.length > 100000) return output(null, "failure", digest);
-              JsonNode answer = JSON.readTree(reply).path("answers").path("decision");
+              JsonNode envelope = JSON.readTree(reply);
+              if (envelope == null || !envelope.isObject() || !envelope.path("model").isTextual() || !settings.model().equals(envelope.path("model").textValue()) || !envelope.path("answers").isObject() || envelope.path("answers").size()!=1 || !envelope.path("answers").has("decision")) return output(null,"failure",digest);
+              JsonNode answer = envelope.path("answers").path("decision");
               JsonNode noul = answer.path("noul");
               if (!"noul".equals(answer.path("type").asText()) || !noul.isNumber())
                 return output(null, "failure", digest);
