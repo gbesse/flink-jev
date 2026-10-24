@@ -63,3 +63,11 @@ FR — Les réponses doivent annoncer le modèle attendu et exactement la questi
 EN — Responses must name the expected model and exactly the decision question; duplicate JSON keys and trailing JSON documents route to failure without a usable probability.
 
 ES — Las respuestas deben indicar el modelo esperado y exactamente la pregunta decision; claves JSON duplicadas y documentos adicionales van a failure sin probabilidad utilizable.
+
+## HTTP body deadline / Délai du corps HTTP / Plazo del cuerpo HTTP
+
+FR — Le délai couvre aussi le corps HTTP incomplet ; un abonné limité à 100 000 octets annule les réponses excessives. Le résultat failure conserve le condensat de la ligne.
+
+EN — The deadline also covers unfinished HTTP bodies; a 100,000-byte subscriber cancels oversized responses. The failure result keeps the input digest.
+
+ES — El plazo cubre cuerpos HTTP incompletos; un suscriptor de 100 000 bytes cancela respuestas excesivas. El resultado failure conserva el resumen de entrada.

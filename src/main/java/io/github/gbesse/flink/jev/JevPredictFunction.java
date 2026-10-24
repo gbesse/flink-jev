@@ -3,7 +3,11 @@ package io.github.gbesse.flink.jev;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.util.concurrent.Flow;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.TimeUnit;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -71,12 +75,22 @@ public final class JevPredictFunction extends AsyncPredictFunction {
           .header("Content-Type", "application/json")
           .header("Authorization", "Bearer " + key)
           .POST(HttpRequest.BodyPublishers.ofString(body.toString())).build();
-      return http.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream())
-          .handle((response, error) -> {
+      CompletableFuture<HttpResponse<byte[]>> pending = http.sendAsync(request, boundedBody());
+      CompletableFuture<Collection<RowData>> guarded = new CompletableFuture<>();
+      CompletableFuture.delayedExecutor(settings.timeoutMs(), TimeUnit.MILLISECONDS).execute(() -> {
+        if (guarded.complete(output(null, "failure", digest))) pending.cancel(true);
+      });
+      guarded.whenComplete((value,error) -> { if (guarded.isCancelled()) pending.cancel(true); });
+      pending.whenComplete((response, error) -> guarded.complete(parseResponse(response, error, digest)));
+      return guarded;
+    } catch (Exception ignored) { return CompletableFuture.completedFuture(output(null, "failure", null)); }
+  }
+
+  private Collection<RowData> parseResponse(HttpResponse<byte[]> response, Throwable error, String digest) {
             if (error != null || response == null) return output(null, "failure", digest);
-            try (InputStream stream = response.body()) {
+            try {
               if (response.statusCode() != 200) return output(null, "failure", digest);
-              byte[] reply = stream.readNBytes(100001);
+              byte[] reply = response.body();
               if (reply.length > 100000) return output(null, "failure", digest);
               JsonNode envelope = JSON.readTree(reply);
               if (envelope == null || !envelope.isObject() || !envelope.path("model").isTextual() || !settings.model().equals(envelope.path("model").textValue()) || !envelope.path("answers").isObject() || envelope.path("answers").size()!=1 || !envelope.path("answers").has("decision")) return output(null,"failure",digest);
@@ -89,8 +103,27 @@ public final class JevPredictFunction extends AsyncPredictFunction {
               String route = p >= settings.threshold() ? "yes" : p <= 1 - settings.threshold() ? "no" : "review";
               return output(p, route, digest);
             } catch (Exception ignored) { return output(null, "failure", digest); }
-          });
-    } catch (Exception ignored) { return CompletableFuture.completedFuture(output(null, "failure", null)); }
+  }
+
+  private static HttpResponse.BodyHandler<byte[]> boundedBody() {
+    return info -> new HttpResponse.BodySubscriber<byte[]>() {
+      private final CompletableFuture<byte[]> result = new CompletableFuture<>();
+      private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+      private Flow.Subscription subscription;
+      public CompletionStage<byte[]> getBody() { return result; }
+      public void onSubscribe(Flow.Subscription value) { subscription = value; subscription.request(1); }
+      public void onNext(List<ByteBuffer> buffers) {
+        for (ByteBuffer buffer : buffers) {
+          if (buffer.remaining() > 100000 - bytes.size()) {
+            subscription.cancel(); result.completeExceptionally(new IllegalStateException("response_limit")); return;
+          }
+          byte[] part = new byte[buffer.remaining()]; buffer.get(part); bytes.writeBytes(part);
+        }
+        subscription.request(1);
+      }
+      public void onError(Throwable error) { result.completeExceptionally(error); }
+      public void onComplete() { result.complete(bytes.toByteArray()); }
+    };
   }
 
   private static Collection<RowData> output(Double probability, String route, String digest) {
