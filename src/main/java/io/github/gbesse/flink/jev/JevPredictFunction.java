@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.apache.flink.metrics.Gauge;
 import org.apache.flink.table.data.GenericRowData;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.table.data.StringData;
@@ -41,6 +42,8 @@ public final class JevPredictFunction extends AsyncPredictFunction {
     if (key == null || key.isBlank()) key = System.getenv("TYPESAFE_API_KEY");
     if (key == null || key.isBlank()) throw new IllegalStateException("JEV_API_KEY is required on Flink TaskManagers");
     initClient();
+    context.getMetricGroup().gauge("jevBudgetUsed", (Gauge<Integer>) calls::get);
+    context.getMetricGroup().gauge("jevBudgetRemaining", (Gauge<Integer>) () -> settings.maxCalls() - calls.get());
   }
 
   void initForTest(String apiKey) { key = apiKey; initClient(); }
@@ -60,8 +63,11 @@ public final class JevPredictFunction extends AsyncPredictFunction {
       if (bytes.length == 0 || bytes.length > settings.maxInputBytes())
         return CompletableFuture.completedFuture(output(null, "review", null));
       String digest = hex(MessageDigest.getInstance("SHA-256").digest(bytes));
-      if (calls.incrementAndGet() > settings.maxCalls())
-        return CompletableFuture.completedFuture(output(null, "review", digest));
+      int current;
+      do {
+        current = calls.get();
+        if (current >= settings.maxCalls()) return CompletableFuture.completedFuture(output(null, "review", digest));
+      } while (!calls.compareAndSet(current, current + 1));
       ObjectNode body = JSON.createObjectNode();
       body.put("model", settings.model());
       body.putObject("state").put("content", content);

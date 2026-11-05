@@ -71,3 +71,14 @@ FR — Le délai couvre aussi le corps HTTP incomplet ; un abonné limité à 10
 EN — The deadline also covers unfinished HTTP bodies; a 100,000-byte subscriber cancels oversized responses. The failure result keeps the input digest.
 
 ES — El plazo cubre cuerpos HTTP incompletos; un suscriptor de 100 000 bytes cancela respuestas excesivas. El resultado failure conserva el resumen de entrada.
+
+
+## 2026-11-05 — FR / EN / ES
+
+FR : Compteurs Flink `jevBudgetUsed` et `jevBudgetRemaining` par instance ; réservation CAS saturée au plafond, sans incrément illimité après épuisement. Les lignes suivantes restent en revue et ne déclenchent aucun HTTP. Tests loopback ajoutés ; le compteur ne prouve ni adoption ni facturation.
+
+EN: Per-instance Flink gauges `jevBudgetUsed` and `jevBudgetRemaining`; CAS reservation saturates at budget instead of incrementing indefinitely after exhaustion. Subsequent rows remain review without HTTP. Added loopback tests; counters prove neither adoption nor billing.
+
+ES: Contadores Flink `jevBudgetUsed` y `jevBudgetRemaining` por instancia; reserva CAS saturada en límite sin incrementar indefinidamente tras agotarlo. Filas posteriores quedan en revisión sin HTTP. Pruebas loopback añadidas; contadores no prueban adopción ni facturación.
+
+FR : Maven local absent ; compilation/tests de framework exigés dans la CI exacte avant fusion. EN: Local Maven unavailable; exact CI framework build/tests required before merge. ES: Maven local ausente; CI exacta de compilación/pruebas de framework requerida antes de fusionar.
