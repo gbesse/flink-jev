@@ -82,3 +82,12 @@ EN: Per-instance Flink gauges `jevBudgetUsed` and `jevBudgetRemaining`; CAS rese
 ES: Contadores Flink `jevBudgetUsed` y `jevBudgetRemaining` por instancia; reserva CAS saturada en límite sin incrementar indefinidamente tras agotarlo. Filas posteriores quedan en revisión sin HTTP. Pruebas loopback añadidas; contadores no prueban adopción ni facturación.
 
 FR : Maven local absent ; compilation/tests de framework exigés dans la CI exacte avant fusion. EN: Local Maven unavailable; exact CI framework build/tests required before merge. ES: Maven local ausente; CI exacta de compilación/pruebas de framework requerida antes de fusionar.
+
+
+## 2026-11-12 — FR / EN / ES
+
+FR : Refuser les rétractions et mises à jour non INSERT avant appel et consommation du budget Flink.
+
+EN: Reject non-INSERT changelog rows before Flink provider calls and budget consumption.
+
+ES: Rechazar filas de cambios no INSERT antes de llamadas y consumo de presupuesto Flink.
