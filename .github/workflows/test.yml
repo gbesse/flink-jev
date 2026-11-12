@@ -16,5 +16,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: flink-jev-jar
-          path: target/flink-jev-0.1.5.jar
+          path: target/flink-jev-0.1.6.jar
           if-no-files-found: error

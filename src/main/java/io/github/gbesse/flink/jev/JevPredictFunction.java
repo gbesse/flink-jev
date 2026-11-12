@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.flink.metrics.Gauge;
+import org.apache.flink.types.RowKind;
 import org.apache.flink.table.data.GenericRowData;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.table.data.StringData;
@@ -57,6 +58,7 @@ public final class JevPredictFunction extends AsyncPredictFunction {
   @Override public CompletableFuture<Collection<RowData>> asyncPredict(RowData input) {
     if (http == null || key == null) return CompletableFuture.completedFuture(output(null, "failure", null));
     try {
+      if (input.getRowKind() != RowKind.INSERT) return CompletableFuture.completedFuture(output(null, "review", null));
       if (input.getArity() != 1 || input.isNullAt(0)) return CompletableFuture.completedFuture(output(null, "review", null));
       String content = input.getString(0).toString();
       byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
